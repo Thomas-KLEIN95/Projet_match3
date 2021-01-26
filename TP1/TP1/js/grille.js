@@ -40,22 +40,23 @@ class Grille {
 
   //Cherche les matchs dans toute la grille et retourne le nombre de matchs trouvés
   chercheMatchs() {
-    let nbMatchs = 0;
+    let totMatchs = 0;
 
     for (let i = 0; i < this.nbColonnes; i++) {
-      nbMatchs += this.chercheMatchsColonne(i);
+      totMatchs += this.chercheMatchsColonne(i);
     }
-    for (let i = 0; i < this.nbLignes; i++) {
-      nbMatchs += this.chercheMatchsLigne(i);
+    for (let j = 0; j < this.nbLignes; j++) {
+      totMatchs += this.chercheMatchsLigne(j);
     }
-    return nbMatchs;
+    console.log("totMatchs " + totMatchs);
+    return totMatchs;
   }
 
   //Cherche des matchs dans une ligne, cache les cookies concernés et retourne le nombre de matchs trouvés
   chercheMatchsLigne(ligne) {
     let cookies = [];
     let j;
-    let nbMatchs = 0;
+    let nbMatchsLigne = 0;
 
     //Parcours de la ligne
     for (let i = 0; i <= (this.nbColonnes - 3); i = j) {
@@ -66,11 +67,13 @@ class Grille {
       while (j < this.nbColonnes && cookies[0].type == this.tabCookies[ligne][j].type) {
         cookies.push(this.tabCookies[ligne][j]);
         j++;
+        
       }
 
       // Si on a trouvé une suite de au moins 3 cookie identiques on les cache
       if (cookies.length >= 3) {
-        nbMatchs++;
+        ++nbMatchsLigne;
+        
         cookies.forEach(cookie => {
           cookie.cache();
         });
@@ -78,14 +81,15 @@ class Grille {
 
       cookies = [];
     }
-    return nbMatchs;
+    console.log("ligne " + ligne + " : " + nbMatchsLigne);
+    return nbMatchsLigne;
   }
 
   //Cherche des matchs dans une colonne, cache les cookies concernés et retourne le nombre de matchs trouvés
   chercheMatchsColonne(colonne) {
     let cookies = [];
     let j;
-    let nbMatchs = 0;
+    let nbMatchsCol = 0;
 
     //Parcours de la colonne
     for (let i = 0; i <= (this.nbLignes - 3); i = j) {
@@ -100,7 +104,7 @@ class Grille {
 
       // Si on a trouvé une suite de au moins 3 cookie identiques on les cache
       if (cookies.length >= 3) {
-        nbMatchs++;
+        ++nbMatchsCol;
         cookies.forEach(cookie => {
           cookie.cache();
         });
@@ -108,7 +112,8 @@ class Grille {
 
       cookies = [];
     }
-    return nbMatchs;
+    console.log("colonne " + colonne + " : " + nbMatchsCol);
+    return nbMatchsCol;
   }
 
   //Permet de chercher les matchs du tableau afin de faire tomber les cookies
@@ -116,7 +121,7 @@ class Grille {
     let colonnes = [];
 
     //Tant qu'on trouve des matchs
-    while (grille.chercheMatchs()) {
+    while (this.chercheMatchs() > 0) {
       //On parcours les ligne de bas en haut
       for (let i = this.nbLignes - 1; i >= 0; i--) {
         //Tant que la ligne possède des "cookie-cache"
@@ -164,7 +169,7 @@ class Grille {
 
   //Parcours une ligne du tableau de cookies et renvoie vrai si un "cookie-cache" s'y trouve, sinon renvoie faux
   possedeCookieCache(ligne) {
-    
+
     for (let i = 0; i < this.nbColonnes; i++) {
       if (this.tabCookies[ligne][i].htmlImage.className == "cookie-cache") {
         return true;
@@ -204,7 +209,9 @@ class Grille {
         for (let j = 0; j < this.nbColonnes; j++) {
           if (this.tabCookies[i][j].htmlImage.className == "cookie-cache") {
             type = Math.floor(this.nbDeCookiesDifferents * Math.random());
-            this.tabCookies[i][j] = new Cookie(type, i, j);
+            this.tabCookies[i][j].type = type;
+            this.tabCookies[i][j].htmlImage.src = Cookie.getUrlNormale(type);
+            this.tabCookies[i][j].htmlImage.className = "cookie";
           }
         }
       }
